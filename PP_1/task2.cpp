@@ -2,6 +2,7 @@
 #include "task2.h"
 #include <Windows.h>
 
+
 double c1(int, int*, int*, int*,int);
 double c2(int, int*, int*, int*,int);
 double c3(int, int*, int*, int*,int);
