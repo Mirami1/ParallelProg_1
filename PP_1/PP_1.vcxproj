@@ -87,7 +87,7 @@
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
@@ -149,7 +149,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="PP_1.cpp" />
+    <ClCompile Include="PP_1.cpp">
+      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ConformanceMode>
+    </ClCompile>
     <ClCompile Include="task2.cpp" />
   </ItemGroup>
   <ItemGroup>

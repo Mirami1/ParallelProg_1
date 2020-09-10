@@ -6,13 +6,13 @@
 #include <string>
 #include <omp.h>
 #include "task2.h"
-
+#include <Windows.h>
 
 using namespace std;
 
 
 
-int n = 3000;
+int n = 10000;
 void f1();
 void f2();
 void f3();
@@ -31,11 +31,16 @@ void printMatrix(int n, int** a) {
 int main(int argc, char** argv)
 {
 	setlocale(LC_ALL, "Russian");
-	f1();
+	printf("Задача - 1\n");
+	//f1();
+	printf("Задача - 2\n");
 	f2();
-	f3();
-	f4();
-	f5();
+	printf("Задача - 3\n");
+	//f3();
+	printf("Задача - 4\n");
+	//f4();
+	printf("Задача - 5\n");
+	//f5();
 }
 
 
@@ -68,6 +73,8 @@ void f2()
 
 
 	printf("accuracy=%g\n", omp_get_wtick()); //точность
+	printf("\t\t static \t dynamic \t guided \t runtime\n");
+
 	int deg = 100; //число повторений опытов
 	for (int k = 1; k < 4; k++) { // 3 типа итераций
 		printf("Type - %d ", k);
@@ -94,6 +101,7 @@ void f2()
  * Reduction позволяет производить безопасное глобальное вычисление. В нашем случае с оператором сложения. Разбивает
  * участки массива на N/кол.-во потоков и поочередно выполняет операции с полученными диапазонами массива
  */
+
 void f3() {
 	int* a = new int[n];
 	for (int i = 0; i < n; i++)
@@ -142,6 +150,16 @@ void f3_2(int* a) { //reduction
 }
 
 void f4() {
+
+	printf("Without barrier: \n");
+#pragma omp parallel
+	{
+		printf("Thread %i before barrier\n", omp_get_thread_num());
+
+		printf("Thread %i after barrier\n", omp_get_thread_num());
+	}
+
+	printf("With barrier: \n");
 #pragma omp parallel
 	{
 		printf("Thread %i before barrier\n", omp_get_thread_num());
@@ -155,34 +173,70 @@ void f4() {
 
 void f5() {
 	int** a = new int* [n];
-	n = 4;
+	int** b = new int* [n];
+	n = 1000;
 	int step = 0;
+	int step_1 = 0;
 	for (int i = 0; i < n; ++i)
 	{
 		a[i] = new int[n];
-		for (int j = 0; j < n; ++j)
+		b[i] = new int[n];
+		for (int j = 0; j < n; ++j) {
 			a[i][j] = step++;
+			b[i][j] = step_1++;
+		}
 	}
-	//printMatrix(n, a);
+//	printMatrix(n, a);
+
+	
+	// Последовательное вычисление
 
 	double t1 = omp_get_wtime();
-	// Последовательное вычисление
-	
+
 	for (int i = 2; i < n; i++)
-		for (int j = 2; j < n; j++)
+		for (int j = 2; j < n; j++) {
 			a[i][j] = a[i - 2][j] + a[i][j - 2];
+			Sleep(0.000001);
+		}
 	
 	double t2 = omp_get_wtime();
 
 	printf("Time: %fs\n", t2 - t1);
-	//printMatrix(n, a);
+//	printMatrix(n, a);
 	printf("\n");
-
+	 
+	
 	// Параллельное вычисление
 
+	t1 = omp_get_wtime();
+	int diag_count = 2 * n - 1; //2n-2 - последняя диагональ из одного элемента
+	for (int d = 4; d <diag_count; d++) { 
+		int i;
+		//определим диапазон i
+		int maxi = d - 1 < n ? d - 1 : n;
+#pragma omp parallel private(i)
+		{
+#pragma omp for
+			for (i = d - (n + 1) > 0 ? 2 + d - (n + 1) : 2; i < maxi; ++i)
+			{
+
+				b[i][d - i] = b[i - 2][d - i] + b[i][d - i - 2];
+				Sleep(0.000001);
+				
+			}
+		}
+		
+	}
+	t2 = omp_get_wtime();
+	printf("Time: %fs\n", t2 - t1);
+	//printMatrix(n, b);
+	//printf("\n");
 	
 
-	for (int i = 0; i < n; ++i)
+	for (int i = 0; i < n; ++i) {
 		delete a[i];
+		delete b[i];
+	}
 	delete a;
+	delete b;
 }
