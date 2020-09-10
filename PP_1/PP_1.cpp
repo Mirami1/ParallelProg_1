@@ -32,15 +32,15 @@ int main(int argc, char** argv)
 {
 	setlocale(LC_ALL, "Russian");
 	printf("Задача - 1\n");
-	//f1();
+	f1();
 	printf("Задача - 2\n");
 	f2();
 	printf("Задача - 3\n");
-	//f3();
+	f3();
 	printf("Задача - 4\n");
-	//f4();
+	f4();
 	printf("Задача - 5\n");
-	//f5();
+	f5();
 }
 
 
